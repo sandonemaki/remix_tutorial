@@ -1,12 +1,15 @@
 import { json } from "@remix-run/node";
-
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-
+import invariant from "tiny-invariant";
 
 import { getContact } from "../data";
 
 
-export const loader = async ({ params }) => {
+export const loader = async ({
+  params,
+}: LoaderFunctionArgs) => {
+  invariant(params.contactId, "Missing contactId param");
   const contact = await getContact(params.contactId);
   return json({ contact });
 };
@@ -18,7 +21,7 @@ export const loader = async ({ params }) => {
 // ルートがマッチすると、Remixは自動的にこのファイルの default export である Contact 関数をレンダリングします。
 // レンダリングの前に、同じファイル内の loader 関数が実行され、そのデータが Contact 関数内で useLoaderData フックを通じて利用可能になります。
 export default function Contact() {
-  const { contact } = useLoaderData<typeof loader>();
+  const {contact} = useLoaderData<typeof loader>();
   // const contact = {
   //   first: "Your",
   //   last: "Name",
