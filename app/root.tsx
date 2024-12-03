@@ -1,4 +1,7 @@
-import type { LinksFunction } from "@remix-run/node";
+import type {
+  LinksFunction,
+  LoaderFunctionArgs,
+} from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 
 import {
@@ -27,11 +30,17 @@ export const links: LinksFunction = () => [
 ];
 
 // データを読み込むために使用する API は 2 つあります。l
-// oader と useLoaderData です。まず、ルートルートに loader 関数を生成してエクスポートし、その後データをレンダリングします。
-export const loader = async () => {
-  const contacts = await getContacts();
+// loader と useLoaderData です。まず、ルートルートに loader 関数を生成してエクスポートし、その後データをレンダリングします。
+export const loader = async ({
+  request,
+}: LoaderFunctionArgs) => {
+  const url = new URL(request.url);
+  // ユーザーが入力した検索クエリを取得
+  const q = url.searchParams.get("q");
+  const contacts = await getContacts(q);
   return json({ contacts });
 };
+
 
 
 export default function App() {
