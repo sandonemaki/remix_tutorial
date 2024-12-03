@@ -1,20 +1,32 @@
-import { Form } from "@remix-run/react";
-import type { FunctionComponent } from "react";
+import { json } from "@remix-run/node";
 
-import type { ContactRecord } from "../data";
+import { Form, useLoaderData } from "@remix-run/react";
+
+
+import { getContact } from "../data";
+
+
+export const loader = async ({ params }) => {
+  const contact = await getContact(params.contactId);
+  return json({ contact });
+};
+
+
+
 
 // ユーザーが /contacts/[id] のようなURLにアクセスすると、Remixのルーターがこのルートに対応するコンポーネントを探します
 // ルートがマッチすると、Remixは自動的にこのファイルの default export である Contact 関数をレンダリングします。
 // レンダリングの前に、同じファイル内の loader 関数が実行され、そのデータが Contact 関数内で useLoaderData フックを通じて利用可能になります。
 export default function Contact() {
-  const contact = {
-    first: "Your",
-    last: "Name",
-    avatar: "https://placecats.com/200/200",
-    twitter: "your_handle",
-    notes: "Some notes",
-    favorite: true,
-  };
+  const { contact } = useLoaderData<typeof loader>();
+  // const contact = {
+  //   first: "Your",
+  //   last: "Name",
+  //   avatar: "https://placecats.com/200/200",
+  //   twitter: "your_handle",
+  //   notes: "Some notes",
+  //   favorite: true,
+  // };
 
   return (
     <div id="contact">
