@@ -11,6 +11,7 @@ export const action = async ({
 }: ActionFunctionArgs) => {
   invariant(params.contactId, "Missing contactId param");
   const formData = await request.formData();
+   // フォームフィールドがいくつかあるため、Object.fromEntriesを使用してそれらをすべてオブジェクトに収集
   const updates = Object.fromEntries(formData);
   await updateContact(params.contactId, updates);
   return redirect(`/contacts/${params.contactId}`);
