@@ -4,6 +4,8 @@ import type {
 } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 
+import { useEffect } from "react";
+
 import {
   Form,
   NavLink,
@@ -48,6 +50,13 @@ export default function App() {
   // loaderからの戻り値
   const { contacts, q } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const searchField = document.getElementById("q");
+    if (searchField instanceof HTMLInputElement) {
+      searchField.value = q || "";
+    }
+  }, [q]);
   return (
     <html lang="en">
       <head>
