@@ -52,6 +52,14 @@ export default function App() {
   const { contacts, q } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const submit = useSubmit();
+  // 何も起こっていない場合、navigation.locationはundefinedになりますが、
+  // ユーザーがナビゲートすると、データの読み込み中に次の場所が設定されます。
+  // その後、location.searchを使用して、ユーザーが検索しているかどうかを確認します。
+  const searching =
+    navigation.location &&
+    new URLSearchParams(navigation.location.search).has(
+      "q"
+    );
 
   useEffect(() => {
     const searchField = document.getElementById("q");
@@ -83,13 +91,18 @@ export default function App() {
               <input
                 id="q"
                 aria-label="Search contacts"
+                className={searching ? "loading" : ""}
                 // loaderからの戻り値をデフォルトの値に設定
                 defaultValue={q || ""}
                 placeholder="Search"
                 type="search"
                 name="q"
               />
-              <div id="search-spinner" aria-hidden hidden={true} />
+              <div
+                id="search-spinner"
+                aria-hidden
+                hidden={!searching} 
+              />
             </Form>
             <Form method="post">
               <button type="submit">New</button>
@@ -143,7 +156,14 @@ export default function App() {
           </nav> */}
         </div>
         {/* loading クラスが適用されるのは detail divのみ */}
-        <div className={navigation.state === "loading" ? "loading" : ""} id='detail'>
+        <div 
+          className={
+            navigation.state === "loading" && !searching
+              ? "loading"
+              : ""
+          }
+          id='detail'
+        >
           <Outlet />
         </div>
 
