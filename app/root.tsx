@@ -38,13 +38,15 @@ export const loader = async ({
   // ユーザーが入力した検索クエリを取得
   const q = url.searchParams.get("q");
   const contacts = await getContacts(q);
-  return json({ contacts });
+  // loader から q を返し、それを入力のデフォルト値として設定する
+  return json({ contacts, q });
 };
 
 
 
 export default function App() {
-  const { contacts } = useLoaderData<typeof loader>();
+  // loaderからの戻り値
+  const { contacts, q } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   return (
     <html lang="en">
@@ -63,6 +65,8 @@ export default function App() {
               <input
                 id="q"
                 aria-label="Search contacts"
+                // loaderからの戻り値をデフォルトの値に設定
+                defaultValue={q || ""}
                 placeholder="Search"
                 type="search"
                 name="q"
