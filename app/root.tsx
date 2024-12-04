@@ -82,10 +82,17 @@ export default function App() {
           <div>
             <Form
               id="search-form"
-              onChange={(event) =>
+              onChange={(event) => {
+                // 最初の検索かどうかを簡単に確認した後、置き換えるかどうかを決定
+                // 最初の検索では新しいエントリが追加されますが、それ以降のキーストロークはすべて現在のエントリを置き換えます。
+                // 検索を削除するために7回戻るボタンをクリックする代わりに、ユーザーは1回戻るボタンをクリックするだけで済みます。
+                
                 // currentTargetは、イベントがアタッチされているDOMノード（form）
-                submit(event.currentTarget)
-              }
+                const isFirstSearch = q === null;
+                submit(event.currentTarget, {
+                  replace: !isFirstSearch,
+                });
+              }}
               role="search"
             >
               <input
