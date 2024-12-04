@@ -1,9 +1,10 @@
 import { json } from "@remix-run/node";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { Form, useFetcher, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
-import { getContact } from "../data";
+import { ContactRecord, getContact, updateContact } from "../data";
+import { FunctionComponent } from "react";
 
 
 export const loader = async ({
@@ -17,7 +18,17 @@ export const loader = async ({
   return json({ contact });
 };
 
-
+export const action = async ({
+  params,
+  request,
+}: ActionFunctionArgs) => {
+  invariant(params.contactId, "Missing contactId param");
+  const formData = await request.formData();
+  // 連絡先を更新
+  return updateContact(params.contactId, {
+    favorite: formData.get("favorite") === "true",
+  });
+};
 
 
 // ユーザーが /contacts/[id] のようなURLにアクセスすると、Remixのルーターがこのルートに対応するコンポーネントを探します
@@ -93,13 +104,19 @@ export default function Contact() {
   );
 }
 
+// Favoriteコンポーネントがcontactオブジェクトを受け取り、その中のfavoriteプロパティのみを使用する
 const Favorite: FunctionComponent<{
+  // contactオブジェクトがfavoriteプロパティのみを持つことを指定
   contact: Pick<ContactRecord, "favorite">;
 }> = ({ contact }) => {
+  const fetcher = useFetcher();
   const favorite = contact.favorite;
 
   return (
-    <Form method="post">
+    // ページ遷移を引き起こさずにフォームを送信するためfetcher.Formを使用
+    // actionを呼び出し、その後すべてのデータが自動的に再検証されます。エラーも同様にキャッチされます
+    // Formとの違いは、ナビゲーションではないため、URLは変更されず、履歴スタックも影響を受けません。
+    <fetcher.Form method="post">
       <button
         aria-label={
           favorite
@@ -111,6 +128,7 @@ const Favorite: FunctionComponent<{
       >
         {favorite ? "★" : "☆"}
       </button>
-    </Form>
+    </fetcher.Form>
   );
 };
+
