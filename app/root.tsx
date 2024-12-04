@@ -75,6 +75,7 @@ export default function App() {
             <Form
               id="search-form"
               onChange={(event) =>
+                // currentTargetは、イベントがアタッチされているDOMノード（form）
                 submit(event.currentTarget)
               }
               role="search"
