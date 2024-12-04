@@ -110,7 +110,14 @@ const Favorite: FunctionComponent<{
   contact: Pick<ContactRecord, "favorite">;
 }> = ({ contact }) => {
   const fetcher = useFetcher();
-  const favorite = contact.favorite;
+  // fetcher.formDataは、フォームが送信されたときにデータを含む
+  // フォーム送信中は値があり、それ以外の時はnullやundefined
+  const favorite = fetcher.formData
+  // フォームデータから "favorite" の値を取得し、それが "true" と等しいかチェック
+    ? fetcher.formData.get("favorite") === "true"
+    // サーバーから取得した元のデータを使用
+    // お気に入り状態を表すブール値
+    : contact.favorite;
 
   return (
     // ページ遷移を引き起こさずにフォームを送信するためfetcher.Formを使用
@@ -120,8 +127,8 @@ const Favorite: FunctionComponent<{
       <button
         aria-label={
           favorite
-            ? "Remove from favorites"
-            : "Add to favorites"
+            ? "お気に入りから削除"
+            : "お気に入りに追加"
         }
         name="favorite"
         value={favorite ? "false" : "true"}
